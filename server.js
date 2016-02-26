@@ -23,12 +23,20 @@ var config = yaml.safeLoad(fs.readFileSync('./config/server.yml', 'utf8')).serve
 
 var port = config.port
 
-var url = 'mongodb://' +　config.mongodb.host + '/gundam_express'
+var mongodb_host
+if(process.env.MONGO_PORT_27017_TCP_ADDR) {
+    // for Docker link
+    mongodb_host = process.env.MONGO_PORT_27017_TCP_ADDR
+} else {
+    mongodb_host = config.mongodb.host
+}
+
+var mongodb_url = 'mongodb://' +　mongodb_host + '/gundam_express'
 
 var MongoClient = require('mongodb').MongoClient
 
 var db
-MongoClient.connect(url, function(err, db) {
+MongoClient.connect(mongodb_url, function(err, db) {
 
     assert.equal(null, err)
 
