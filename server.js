@@ -22,16 +22,24 @@ app.get('/api/ping', function(req, res) {
 var config = yaml.safeLoad(fs.readFileSync('./config/server.yml', 'utf8')).server
 
 var port = config.port
+// for Cloud Foundry
+port = process.env.PORT || port
 
-var mongodb_host
-if(process.env.MONGO_PORT_27017_TCP_ADDR) {
-    // for Docker link
-    mongodb_host = process.env.MONGO_PORT_27017_TCP_ADDR
+var mongodb_url
+if(process.env.VCAP_SERVICES) {
+    // for Cloud Foundry
+    services = JSON.parse(process.env.VCAP_SERVICES);
+    mongodb_url = services.mongolab[0].credentials.uri;
 } else {
-    mongodb_host = config.mongodb.host
+    var mongodb_host
+    if(process.env.MONGO_PORT_27017_TCP_ADDR) {
+        // for Docker link
+        mongodb_host = process.env.MONGO_PORT_27017_TCP_ADDR
+    } else {
+        mongodb_host = config.mongodb.host
+    }
+    mongodb_url = 'mongodb://' +　mongodb_host + '/gundam_express'
 }
-
-var mongodb_url = 'mongodb://' +　mongodb_host + '/gundam_express'
 
 var MongoClient = require('mongodb').MongoClient
 

@@ -1,0 +1,9 @@
+---
+applications:
+- name: gundam-express
+  memory: 256MB
+  random-route: true
+  buildpack: nodejs_buildpack
+  command: node server.js
+  services:
+   - cf-mongo
